@@ -6,7 +6,7 @@ let socket: Socket | null = null;
 export const initSocket = (userId: number) => {
   if (socket) return socket;
 
-  socket = io('http://localhost:3001');
+  socket = io('https://vibingmalayali.onrender.com');
 
   socket.on('connect', () => {
     socket?.emit('authenticate', userId);
@@ -52,7 +52,7 @@ export const initSocket = (userId: number) => {
 
   socket.on('relation_updated', (relation) => {
     // Basic reload of relations
-    fetch(`http://localhost:3001/api/users/${userId}/relations`)
+    fetch(`https://vibingmalayali.onrender.com/api/users/${userId}/relations`)
       .then((res) => res.json())
       .then((data) => useChatStore.getState().setRelations(data));
   });
