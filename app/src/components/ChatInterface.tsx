@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, UserCircle } from 'lucide-react';
+import { Send, X, Reply, Smile, Music } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function ChatInterface() {

@@ -10,7 +10,7 @@ export default function DirectMessageModal() {
   const [isTyping, setIsTyping] = useState(false);
   const [remoteTyping, setRemoteTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const targetUser = users.find(u => u.id === activeDmUserId);
 

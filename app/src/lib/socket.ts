@@ -50,7 +50,7 @@ export const initSocket = (userId: number) => {
     useChatStore.getState().addDm(dm);
   });
 
-  socket.on('relation_updated', (relation) => {
+  socket.on('relation_updated', () => {
     // Basic reload of relations
     fetch(`https://vibingmalayali.onrender.com/api/users/${userId}/relations`)
       .then((res) => res.json())

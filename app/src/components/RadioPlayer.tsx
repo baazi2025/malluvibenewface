@@ -5,7 +5,7 @@ import { Play, Pause, Volume2, VolumeX, Radio } from 'lucide-react';
 
 export default function RadioPlayer() {
   const { radioState, setRadioState, currentUser } = useChatStore();
-  const [volume, setVolume] = useState(0.5);
+  const [volume] = useState(0.5);
   // We use a dummy audio source for demo purposes
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
