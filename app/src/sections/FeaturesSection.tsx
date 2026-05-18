@@ -8,14 +8,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 const features = [
   {
-    icon: '🎙️',
-    title: 'Live Voice Rooms',
-    body: 'RJ become karyam — host your own room or join others. Talk about movies, life, or just chill.',
-    glowColor: 'rgba(45,138,94,0.25)',
-    iconBg: 'rgba(45,138,94,0.2)',
-    iconBorder: 'rgba(45,138,94,0.3)',
-  },
-  {
     icon: '🏆',
     title: 'Daily Rewards',
     body: '100 coins = ₹1. Login daily, stay active, earn real rewards. Your time here is valued.',
@@ -23,6 +15,7 @@ const features = [
     iconBg: 'rgba(255,140,105,0.2)',
     iconBorder: 'rgba(255,140,105,0.3)',
   },
+
   {
     icon: '👑',
     title: 'VIP & Badges',
@@ -81,6 +74,7 @@ export default function FeaturesSection() {
 
   return (
     <section
+      id="features-section"
       ref={sectionRef}
       style={{
         padding: '120px 5vw',

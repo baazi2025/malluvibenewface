@@ -22,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 function App() {
   const lenisRef = useRef<Lenis | null>(null)
-  const { hasEnteredSite } = useChatStore()
+  const { hasEnteredSite, activeRoom } = useChatStore()
 
   useEffect(() => {
     // Initialize Lenis smooth scroll
@@ -64,8 +64,8 @@ function App() {
         
         {hasEnteredSite && (
           <>
-            <TrendingRoomsSection />
             <FeaturesSection />
+            <TrendingRoomsSection />
             <LiveNowSection />
             <LoginBonusSection />
             <FooterSection />
@@ -74,7 +74,7 @@ function App() {
             <LoginModal />
             <ChatInterface />
             <DirectMessageModal />
-            <RadioPlayer />
+            {activeRoom && <RadioPlayer />}
             <ReactionSystem />
           </>
         )}

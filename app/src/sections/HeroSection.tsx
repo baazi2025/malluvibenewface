@@ -15,7 +15,7 @@ export default function HeroSection() {
   const handleJoin = () => {
     setHasEnteredSite(true)
     setTimeout(() => {
-      document.getElementById('rooms-section')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
   return (
