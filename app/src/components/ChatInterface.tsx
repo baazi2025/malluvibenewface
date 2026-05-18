@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic, Plus } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic, Plus, Image, Sticker } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -165,14 +165,38 @@ export default function ChatInterface() {
                       </div>
                     )}
                     
-                    {msg.isGame && !isMe && (
-                      <div className="mt-3 flex gap-2">
-                        <button onClick={() => handleGameAction(10)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition flex items-center gap-1">
-                          <Trophy size={12} className="text-yellow-400" /> +10 Points
-                        </button>
-                        <button onClick={() => handleGameAction(5)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition">
-                          👍 Nice Play
-                        </button>
+                    {msg.isGame && (
+                      <div className="mt-3 flex flex-wrap gap-2 items-center border-t border-white/10 pt-3">
+                        {!isMe && (
+                          <>
+                            <button onClick={() => handleGameAction(10)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition flex items-center gap-1 shadow-sm">
+                              <Trophy size={12} className="text-yellow-400" /> +10 Points
+                            </button>
+                            <button onClick={() => handleGameAction(5)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition shadow-sm">
+                              👍 Nice Play
+                            </button>
+                          </>
+                        )}
+                        
+                        {/* Tag Player Dropdown */}
+                        <div className="relative flex-1 min-w-[120px]">
+                          <select 
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setInput(`@${e.target.value} your turn! `);
+                                setReplyTo(msg);
+                                // Focus input somehow, or just let them click it
+                              }
+                            }}
+                            className="w-full bg-black/30 hover:bg-black/50 text-white text-xs px-3 py-1.5 rounded-full appearance-none cursor-pointer border border-white/10 outline-none transition"
+                            defaultValue=""
+                          >
+                            <option value="" disabled>🎯 Tag a player...</option>
+                            {onlineUsers.filter(u => u.id !== currentUser?.id).map(u => (
+                              <option key={u.id} value={u.username}>@{u.username}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     )}
                     
@@ -225,10 +249,22 @@ export default function ChatInterface() {
                   <BarChart2 size={16} /> Create Poll
                 </button>
                 <button 
-                  onClick={() => { alert('Coming soon!'); setShowActions(false); }}
+                  onClick={() => { alert('Attach File coming soon!'); setShowActions(false); }}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-300 hover:bg-white/10 transition"
                 >
                   <Paperclip size={16} /> Attach File
+                </button>
+                <button 
+                  onClick={() => { alert('GIF integration (Giphy/Tenor) coming soon!'); setShowActions(false); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-300 hover:bg-white/10 transition"
+                >
+                  <Image size={16} /> Send GIF
+                </button>
+                <button 
+                  onClick={() => { alert('Sticker packs coming soon!'); setShowActions(false); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-300 hover:bg-white/10 transition"
+                >
+                  <Sticker size={16} /> Stickers
                 </button>
               </div>
             )}
