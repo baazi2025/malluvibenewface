@@ -70,7 +70,18 @@ export default function ChatInterface() {
 
   const sendReaction = (emoji: string) => {
     if (cooldown || !currentUser) return;
+    
+    // 1. Trigger the screen-wide animation burst
     getSocket()?.emit('send_reaction', { room: activeRoom, emoji });
+    
+    // 2. Deliver it to the chat room feed
+    getSocket()?.emit('send_message', { 
+      room: activeRoom, 
+      content: emoji, 
+      replyToId: null,
+      isAnonymous: false,
+      pollData: null
+    });
     
     // Anti-spam cooldown
     setCooldown(true);
