@@ -54,6 +54,7 @@ interface ChatState {
   activeDmUserId: number | null;
   relations: UserRelation[];
   radioState: { isPlaying: boolean; isMuted: boolean; track: string };
+  showLoginModal: boolean;
   
   setCurrentUser: (user: User) => void;
   setUsers: (users: User[]) => void;
@@ -69,6 +70,7 @@ interface ChatState {
   addRelation: (relation: UserRelation) => void;
   removeRelation: (targetId: number, type: string) => void;
   setRadioState: (state: Partial<ChatState['radioState']>) => void;
+  setShowLoginModal: (show: boolean) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -80,6 +82,7 @@ export const useChatStore = create<ChatState>((set) => ({
   activeDmUserId: null,
   relations: [],
   radioState: { isPlaying: false, isMuted: false, track: 'Vibe FM - LoFi Beats' },
+  showLoginModal: false,
 
   setCurrentUser: (user) => set({ currentUser: user }),
   setUsers: (users) => set({ users }),
@@ -106,4 +109,5 @@ export const useChatStore = create<ChatState>((set) => ({
     })),
   setRadioState: (newState) =>
     set((state) => ({ radioState: { ...state.radioState, ...newState } })),
+  setShowLoginModal: (show) => set({ showLoginModal: show }),
 }));

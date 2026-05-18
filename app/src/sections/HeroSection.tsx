@@ -12,14 +12,12 @@ const stats = [
 const avatarColors = ['#D4A843', '#2D8A5E', '#FF8C69', '#6B2D5B', '#2D5A6B']
 
 export default function HeroSection() {
-  const { currentUser, setActiveRoom } = useChatStore()
+  const { currentUser, setActiveRoom, setShowLoginModal } = useChatStore()
 
   const handleJoin = () => {
     if (!currentUser) {
-      // If not logged in, clear local storage just to be safe and let user see login modal by removing currentUser
-      // Wait, LoginModal shows automatically if currentUser is null.
-      // But they are already seeing the hero section. That means currentUser is NOT null.
-      // If currentUser is not null, open the main room.
+      setShowLoginModal(true);
+      return;
     }
     setActiveRoom('Friends Vibing')
     getSocket()?.emit('join_room', 'Friends Vibing')
@@ -85,26 +83,14 @@ export default function HeroSection() {
         <div className="flex flex-wrap items-center justify-center gap-4 mt-10 animate-float">
           <button
             onClick={handleJoin}
-            className="px-10 py-[18px] rounded-2xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:brightness-110"
+            className="px-12 py-[20px] rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:brightness-110 shadow-[0_0_40px_rgba(212,168,67,0.3)]"
             style={{
               background: 'linear-gradient(135deg, #D4A843, #FF8C69)',
               color: '#1A1A1A',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}
           >
-            🚀 Join the Vibe
-          </button>
-          <button
-            onClick={handleJoin}
-            className="px-10 py-[18px] rounded-2xl font-semibold text-base transition-all duration-300 hover:bg-[rgba(255,255,255,0.12)]"
-            style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: '#FFFFFF',
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-            }}
-          >
-            Enter as Guest
+            🚀 Welcome to the Vibe
           </button>
         </div>
 

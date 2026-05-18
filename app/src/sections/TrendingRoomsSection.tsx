@@ -18,10 +18,13 @@ export default function TrendingRoomsSection() {
   const headingRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<HTMLDivElement>(null)
   
-  const { setActiveRoom, currentUser } = useChatStore()
+  const { setActiveRoom, currentUser, setShowLoginModal } = useChatStore()
 
   const handleRoomClick = (roomName: string) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setShowLoginModal(true);
+      return;
+    }
     setActiveRoom(roomName);
     getSocket()?.emit('join_room', roomName);
   }
