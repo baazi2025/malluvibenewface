@@ -24,7 +24,7 @@ export default function ReactionSystem() {
       gravity: 0.5,
       decay: 0.94,
       startVelocity: 30,
-      shapes: ['circle', 'square'],
+      shapes: ['circle' as const, 'square' as const],
       colors: ['#FFE400', '#FFBD00', '#E89400', '#FFCA6C', '#FDFFB8']
     };
 

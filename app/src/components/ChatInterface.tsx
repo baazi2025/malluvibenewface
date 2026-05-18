@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Gamepad2, Ghost, BarChart2 } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2 } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -146,8 +146,8 @@ export default function ChatInterface() {
                     {/* Poll Rendering */}
                     {msg.pollData && (
                       <div className="mt-3 space-y-2">
-                        {JSON.parse(msg.pollData).options.map((opt: any, idx: number) => {
-                          const totalVotes = JSON.parse(msg.pollData).options.reduce((acc: number, o: any) => acc + o.votes, 0);
+                        {JSON.parse(msg.pollData as string).options.map((opt: any, idx: number) => {
+                          const totalVotes = JSON.parse(msg.pollData as string).options.reduce((acc: number, o: any) => acc + o.votes, 0);
                           const percent = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
                           return (
                             <button 

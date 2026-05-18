@@ -60,6 +60,7 @@ interface ChatState {
   updateUser: (userId: number, updates: Partial<User>) => void;
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
+  updateMessage: (message: Message) => void;
   setDms: (dms: DirectMessage[]) => void;
   addDm: (dm: DirectMessage) => void;
   setActiveRoom: (room: string | null) => void;
@@ -88,7 +89,7 @@ export const useChatStore = create<ChatState>((set) => ({
     })),
   setMessages: (messages) => set({ messages }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  updateMessage: (message) => set((state) => ({
+  updateMessage: (message: Message) => set((state) => ({
     messages: state.messages.map(m => m.id === message.id ? message : m)
   })),
   setDms: (dms) => set({ dms }),
