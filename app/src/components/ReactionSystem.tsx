@@ -16,8 +16,9 @@ export default function ReactionSystem() {
 
   const triggerBurst = useCallback((emoji: string) => {
     // Determine configuration based on emoji type
-    const scalar = emoji === '🔥' || emoji === '💥' ? 2 : 1.5;
-    const particleCount = emoji === '🎉' ? 100 : 40;
+    const isHeart = emoji === '❤️' || emoji === '😍' || emoji === '💕';
+    const scalar = emoji === '🔥' || emoji === '💥' ? 2 : (isHeart ? 1.8 : 1.5);
+    const particleCount = emoji === '🎉' ? 100 : (isHeart ? 80 : 40);
     
     // Confetti explosion
     const defaults = {
@@ -32,6 +33,18 @@ export default function ReactionSystem() {
 
     if (emoji === '🎉') {
       confetti({ ...defaults, particleCount, spread: 100, origin: { y: 0.8 } });
+    } else if (isHeart) {
+      const emojiShape = confetti.shapeFromText({ text: emoji, scalar });
+      confetti({
+        ...defaults,
+        particleCount,
+        spread: 140,
+        startVelocity: 70,
+        gravity: 0.3,
+        decay: 0.92,
+        shapes: [emojiShape],
+        origin: { y: 1.1, x: 0.5 } // Shoot up from below the screen
+      });
     } else {
       // Emoji specific burst
       const emojiShape = confetti.shapeFromText({ text: emoji, scalar });
