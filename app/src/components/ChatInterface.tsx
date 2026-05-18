@@ -84,8 +84,8 @@ export default function ChatInterface() {
   if (!activeRoom) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#001F3F]/90 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0A2A4A] w-full max-w-6xl h-[85vh] rounded-2xl border border-white/10 flex overflow-hidden shadow-2xl flex-col md:flex-row">
+    <div className="fixed inset-0 z-50 bg-[#001F3F]/90 backdrop-blur-md flex items-center justify-center p-4 md:p-6">
+      <div className="bg-[#0A2A4A] w-full max-w-[95vw] h-[95vh] rounded-3xl border border-white/10 flex overflow-hidden shadow-2xl flex-col md:flex-row">
         
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col h-full border-r border-white/10">
@@ -254,7 +254,7 @@ export default function ChatInterface() {
         </div>
 
         {/* Chatters List Tab */}
-        <div className="w-full md:w-80 bg-black/20 flex flex-col h-full border-l border-white/10">
+        <div className="w-full md:w-96 bg-black/20 flex flex-col h-full border-l border-white/10">
           <div className="p-4 border-b border-white/10 bg-white/5">
             <h3 className="text-white font-semibold">Chatters</h3>
           </div>
