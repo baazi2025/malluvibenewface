@@ -77,6 +77,14 @@
   }
 }
 
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.05); color: #ff8080; text-shadow: 0 0 10px rgba(255, 128, 128, 0.5); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.05); color: #ff8080; text-shadow: 0 0 10px rgba(255, 128, 128, 0.5); }
+  70% { transform: scale(1); }
+}
+
 /* Utility Classes */
 .animate-pulse-dot {
   animation: pulse 2s infinite;
@@ -97,6 +105,11 @@
 .animate-shimmer {
   background-size: 200% auto;
   animation: shimmer 3s linear infinite;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+  display: inline-block;
 }
 
 /* Glassmorphism */

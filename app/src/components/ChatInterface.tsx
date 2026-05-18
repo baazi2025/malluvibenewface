@@ -118,6 +118,7 @@ export default function ChatInterface() {
               // Birthday check
               const today = format(new Date(), 'MM-dd');
               const isBirthday = msg.sender.birthdate && msg.sender.birthdate.endsWith(today);
+              const isLoveMessage = msg.content.toLowerCase().includes('i love you') || msg.content.toLowerCase().includes('love you');
 
               return (
                 <div key={msg.id} id={`msg-${msg.id}`} className={`flex flex-col ${isMe && !msg.isAnonymous ? 'items-end' : 'items-start'} relative group/msg`}>
@@ -140,7 +141,9 @@ export default function ChatInterface() {
                         {msg.replyTo.content.substring(0, 50)}...
                       </div>
                     )}
-                    <p className="text-white whitespace-pre-wrap leading-normal text-sm">{msg.content}</p>
+                    <p className={`text-white whitespace-pre-wrap leading-normal text-sm ${isLoveMessage ? 'animate-heartbeat font-medium text-pink-100' : ''}`}>
+                      {msg.content}
+                    </p>
                     
                     {/* Poll Rendering */}
                     {msg.pollData && (
