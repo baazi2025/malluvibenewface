@@ -38,9 +38,15 @@ export const initSocket = (userId: number) => {
     }
   });
 
-  socket.on('new_message', (msg) => {
-    if (useChatStore.getState().activeRoom === msg.roomId) {
-      useChatStore.getState().addMessage(msg);
+  socket.on('new_message', (message) => {
+    if (useChatStore.getState().activeRoom === message.roomId) {
+      useChatStore.getState().addMessage(message);
+    }
+  });
+
+  socket.on('message_updated', (message) => {
+    if (useChatStore.getState().activeRoom === message.roomId) {
+      useChatStore.getState().updateMessage(message);
     }
   });
 

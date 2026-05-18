@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Gamepad2 } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Gamepad2, Ghost, BarChart2 } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -10,6 +10,7 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<any>(null);
   const [cooldown, setCooldown] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍'];
@@ -24,14 +25,34 @@ export default function ChatInterface() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || !currentUser) return;
-    getSocket()?.emit('send_message', {
-      room: activeRoom,
-      content: input,
-      replyToId: replyTo?.id || null
+    if (!input.trim() && !replyTo) return;
+    
+    // Check if it's a poll command
+    let pollData = null;
+    let actualContent = input;
+    if (input.startsWith('/poll ')) {
+      const parts = input.replace('/poll ', '').split('|').map(s => s.trim());
+      if (parts.length > 1) {
+        actualContent = '📊 ' + parts[0];
+        pollData = {
+          question: parts[0],
+          options: parts.slice(1).map(opt => ({ text: opt, votes: 0 })),
+          votedUsers: []
+        };
+      }
+    }
+
+    getSocket()?.emit('send_message', { 
+      room: activeRoom, 
+      content: actualContent, 
+      replyToId: replyTo?.id,
+      isAnonymous,
+      pollData
     });
+    
     setInput('');
     setReplyTo(null);
+    setIsAnonymous(false);
   };
 
   const handleReply = (msg: any) => {
@@ -100,11 +121,12 @@ export default function ChatInterface() {
               const isBirthday = msg.sender.birthdate && msg.sender.birthdate.endsWith(today);
 
               return (
-                <div key={msg.id} id={`msg-${msg.id}`} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} transition-colors duration-500 rounded-lg p-1`}>
+                <div key={msg.id} id={`msg-${msg.id}`} className={`flex flex-col ${isMe && !msg.isAnonymous ? 'items-end' : 'items-start'} relative group/msg`}>
                   <div className="flex items-center gap-2 mb-1">
                     {!isMe && <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs">{msg.sender.username[0].toUpperCase()}</div>}
-                    <span className={`text-sm ${isBirthday ? 'text-[#D4A843] font-bold' : 'text-gray-300'}`}>
-                      {msg.sender.username} {isBirthday && '🎉'}
+                    <span className={`text-sm font-bold ${isBirthday ? 'text-[#D4A843]' : 'text-gray-300'} flex items-center gap-1`}>
+                      {msg.isAnonymous && <Ghost size={12} className="text-gray-400" />}
+                      {msg.isAnonymous ? 'Anonymous' : msg.sender.username} {isBirthday && '🎉'}
                     </span>
                     <span className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</span>
                   </div>
@@ -120,6 +142,29 @@ export default function ChatInterface() {
                       </div>
                     )}
                     <p className="text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    
+                    {/* Poll Rendering */}
+                    {msg.pollData && (
+                      <div className="mt-3 space-y-2">
+                        {JSON.parse(msg.pollData).options.map((opt: any, idx: number) => {
+                          const totalVotes = JSON.parse(msg.pollData).options.reduce((acc: number, o: any) => acc + o.votes, 0);
+                          const percent = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
+                          return (
+                            <button 
+                              key={idx}
+                              onClick={() => getSocket()?.emit('vote_poll', { messageId: msg.id, optionIndex: idx })}
+                              className="w-full relative overflow-hidden bg-black/20 hover:bg-black/40 border border-white/10 rounded-lg p-2 text-left transition"
+                            >
+                              <div className="absolute left-0 top-0 bottom-0 bg-[#D4A843]/30 transition-all duration-500" style={{ width: `${percent}%` }} />
+                              <div className="relative flex justify-between text-sm text-white">
+                                <span>{opt.text}</span>
+                                <span className="text-gray-300">{opt.votes} ({percent}%)</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                     
                     {msg.isGame && !isMe && (
                       <div className="mt-3 flex gap-2">
@@ -146,8 +191,24 @@ export default function ChatInterface() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area & Reaction Bar */}
+          {/* Input Area */}
           <div className="p-4 border-t border-white/10 bg-black/20 flex flex-col gap-3">
+            {/* Context Actions (Polls, Ghost) */}
+            <div className="flex items-center gap-2 px-1">
+              <button
+                onClick={() => setIsAnonymous(!isAnonymous)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition ${isAnonymous ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/50' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+              >
+                <Ghost size={14} /> {isAnonymous ? 'Ghost Mode ON' : 'Confession Mode'}
+              </button>
+              <button
+                onClick={() => setInput('/poll Question? | Option 1 | Option 2')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/5 text-gray-400 hover:bg-white/10 transition"
+              >
+                <BarChart2 size={14} /> Create Poll
+              </button>
+            </div>
+
             {/* Reaction Bar */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
               {EMOJIS.map(emoji => (

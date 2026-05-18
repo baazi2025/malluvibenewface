@@ -82,19 +82,59 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', async (data) => {
     if (!currentUser) return;
-    const { room, content, replyToId, isGame } = data;
+    const { room, content, replyToId, isGame, isAnonymous, pollData } = data;
     try {
-      const msg = await prisma.message.create({
+      let msg = await prisma.message.create({
         data: {
           content,
           roomId: room,
           senderId: currentUser.id,
-          replyToId: replyToId || null
+          replyToId: replyToId || null,
+          isAnonymous: isAnonymous || false,
+          pollData: pollData ? JSON.stringify(pollData) : null
         },
         include: { sender: true, replyTo: { include: { sender: true } } }
       });
+      
+      // Mask sender if anonymous
+      if (msg.isAnonymous) {
+        msg.sender = { ...msg.sender, username: 'Anonymous Ghost 👻', avatar: '' };
+      }
+
       // Attach game flag dynamically (not saved in DB for simplicity, just passed to clients)
       io.to(room).emit('new_message', { ...msg, isGame: !!isGame });
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  socket.on('vote_poll', async (data) => {
+    if (!currentUser) return;
+    const { messageId, optionIndex } = data;
+    try {
+      const msg = await prisma.message.findUnique({ where: { id: messageId }});
+      if (msg && msg.pollData) {
+        let poll = JSON.parse(msg.pollData);
+        if (!poll.votedUsers) poll.votedUsers = [];
+        
+        // Prevent double voting
+        if (poll.votedUsers.includes(currentUser.id)) return;
+        
+        poll.options[optionIndex].votes += 1;
+        poll.votedUsers.push(currentUser.id);
+
+        const updatedMsg = await prisma.message.update({
+          where: { id: messageId },
+          data: { pollData: JSON.stringify(poll) },
+          include: { sender: true, replyTo: { include: { sender: true } } }
+        });
+
+        if (updatedMsg.isAnonymous) {
+          updatedMsg.sender = { ...updatedMsg.sender, username: 'Anonymous Ghost 👻', avatar: '' };
+        }
+
+        io.to(msg.roomId).emit('message_updated', updatedMsg);
+      }
     } catch (e) {
       console.error(e);
     }

@@ -37,6 +37,8 @@ model Message {
   replyToId Int?     // If replying to another message
   replyTo   Message? @relation("MessageReplies", fields: [replyToId], references: [id])
   replies   Message[] @relation("MessageReplies")
+  isAnonymous Boolean @default(false)
+  pollData  String?  // JSON string for polls {"question": "...", "options": {"A": 0, "B": 0}}
   createdAt DateTime @default(now())
 }
 

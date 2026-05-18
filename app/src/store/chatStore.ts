@@ -23,6 +23,8 @@ export interface Message {
   createdAt: string;
   isGame?: boolean;
   gameType?: string;
+  isAnonymous?: boolean;
+  pollData?: string;
 }
 
 export interface DirectMessage {
@@ -86,6 +88,9 @@ export const useChatStore = create<ChatState>((set) => ({
     })),
   setMessages: (messages) => set({ messages }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
+  updateMessage: (message) => set((state) => ({
+    messages: state.messages.map(m => m.id === message.id ? message : m)
+  })),
   setDms: (dms) => set({ dms }),
   addDm: (dm) => set((state) => ({ dms: [...state.dms, dm] })),
   setActiveRoom: (room) => set({ activeRoom: room }),
