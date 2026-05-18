@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSocket } from '../lib/socket';
+import { useChatStore } from '../store/chatStore';
 
 interface FloatingEmoji {
   id: string;
@@ -11,6 +12,7 @@ interface FloatingEmoji {
 
 export default function ReactionSystem() {
   const [floatingEmojis, setFloatingEmojis] = useState<FloatingEmoji[]>([]);
+  const { currentUser } = useChatStore();
 
   const triggerBurst = useCallback((emoji: string) => {
     // Determine configuration based on emoji type
@@ -53,7 +55,7 @@ export default function ReactionSystem() {
 
   useEffect(() => {
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket || !currentUser) return;
 
     const handleReaction = ({ emoji }: { emoji: string }) => {
       triggerBurst(emoji);
@@ -61,7 +63,7 @@ export default function ReactionSystem() {
 
     socket.on('receive_reaction', handleReaction);
     return () => { socket.off('receive_reaction', handleReaction); };
-  }, [triggerBurst]);
+  }, [triggerBurst, currentUser]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
