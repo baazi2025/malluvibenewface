@@ -8,7 +8,10 @@ export default function ChatInterface() {
   const { activeRoom, setActiveRoom, messages, users, currentUser, relations } = useChatStore();
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<any>(null);
+  const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍'];
 
   // Group users by status
   const onlineUsers = users.filter(u => u.status === 'online');
@@ -41,6 +44,15 @@ export default function ChatInterface() {
       el.classList.add('bg-white/20');
       setTimeout(() => el.classList.remove('bg-white/20'), 1500);
     }
+  };
+
+  const sendReaction = (emoji: string) => {
+    if (cooldown || !currentUser) return;
+    getSocket()?.emit('send_reaction', { room: activeRoom, emoji });
+    
+    // Anti-spam cooldown
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 500);
   };
 
   if (!activeRoom) return null;
@@ -115,8 +127,22 @@ export default function ChatInterface() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className="p-4 border-t border-white/10 bg-black/20">
+          {/* Input Area & Reaction Bar */}
+          <div className="p-4 border-t border-white/10 bg-black/20 flex flex-col gap-3">
+            {/* Reaction Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {EMOJIS.map(emoji => (
+                <button
+                  key={emoji}
+                  onClick={() => sendReaction(emoji)}
+                  disabled={cooldown}
+                  className={`flex-shrink-0 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 active:scale-95 transition-all flex items-center justify-center text-xl ${cooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
             {replyTo && (
               <div className="mb-2 bg-white/5 p-2 rounded-lg flex justify-between items-center border-l-2 border-[#D4A843]">
                 <div className="text-sm">

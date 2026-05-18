@@ -92,6 +92,12 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('send_reaction', (data) => {
+    // data: { room: 'Friends Vibing', emoji: '🔥' }
+    if (!currentUser) return;
+    io.to(data.room).emit('receive_reaction', { userId: currentUser.id, emoji: data.emoji });
+  });
+
   socket.on('update_note', async (note) => {
     if (!currentUser) return;
     try {

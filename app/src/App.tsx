@@ -14,6 +14,8 @@ import ChatInterface from './components/ChatInterface'
 import DirectMessageModal from './components/DirectMessageModal'
 import RadioPlayer from './components/RadioPlayer'
 import LoginModal from './components/LoginModal'
+import ReactionSystem from './components/ReactionSystem'
+import AnimatedBackground from './components/AnimatedBackground'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -50,11 +52,12 @@ function App() {
   return (
     <div
       style={{
-        background: '#001F3F',
         minHeight: '100vh',
         color: '#FFFFFF',
       }}
     >
+      <AnimatedBackground />
+      <div className="relative z-10">
       <HeroSection />
       <TrendingRoomsSection />
       <FeaturesSection />
@@ -67,6 +70,8 @@ function App() {
       <ChatInterface />
       <DirectMessageModal />
       <RadioPlayer />
+      <ReactionSystem />
+      </div>
     </div>
   )
 }
