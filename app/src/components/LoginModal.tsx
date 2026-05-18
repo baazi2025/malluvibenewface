@@ -4,7 +4,7 @@ import { initSocket, getSocket } from '../lib/socket';
 import { X, UserCheck, User } from 'lucide-react';
 
 export default function LoginModal() {
-  const { currentUser, setCurrentUser, showLoginModal, setShowLoginModal, setActiveRoom } = useChatStore();
+  const { setCurrentUser, showLoginModal, setShowLoginModal, setActiveRoom } = useChatStore();
   const [mode, setMode] = useState<'selection' | 'prime'>('selection');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
