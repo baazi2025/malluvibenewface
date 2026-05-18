@@ -1,7 +1,5 @@
 import NameHelix from '../components/NameHelix'
 import BottomNav from '../components/BottomNav'
-import { useChatStore } from '../store/chatStore'
-import { getSocket } from '../lib/socket'
 
 const stats = [
   { value: '12,438', label: 'Online' },
