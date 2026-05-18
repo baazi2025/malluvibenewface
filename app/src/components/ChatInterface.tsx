@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -10,6 +10,8 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<any>(null);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍', '💯', '✨', '💀', '👀', '🥺', '😎', '💃', '🕺', '🥳', '🙌', '🍿', '🎲'];
@@ -189,35 +191,47 @@ export default function ChatInterface() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-white/10 bg-black/20 flex flex-col gap-3">
-            {/* Context Actions (Polls, Ghost) */}
-            <div className="flex items-center gap-2 px-1">
-              <button
-                onClick={() => setIsAnonymous(!isAnonymous)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition ${isAnonymous ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/50' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
-              >
-                <Ghost size={14} /> {isAnonymous ? 'Ghost Mode ON' : 'Confession Mode'}
-              </button>
-              <button
-                onClick={() => setInput('/poll Question? | Option 1 | Option 2')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/5 text-gray-400 hover:bg-white/10 transition"
-              >
-                <BarChart2 size={14} /> Create Poll
-              </button>
-            </div>
+          <div className="p-3 border-t border-white/10 bg-black/20 relative">
+            
+            {/* Action Menus (Emojis & Tools) */}
+            {showEmojis && (
+              <div className="absolute bottom-20 right-16 bg-[#0A2A4A] border border-white/10 p-3 rounded-2xl shadow-2xl z-50 w-64 origin-bottom-right">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {EMOJIS.map(emoji => (
+                    <button
+                      key={emoji}
+                      onClick={() => { setInput(prev => prev + emoji); setShowEmojis(false); }}
+                      className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-xl transition-all"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            {/* Reaction Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-              {EMOJIS.map(emoji => (
+            {showActions && (
+              <div className="absolute bottom-20 left-4 bg-[#0A2A4A] border border-white/10 p-2 rounded-2xl shadow-2xl z-50 flex flex-col gap-2 origin-bottom-left">
                 <button
-                  key={emoji}
-                  onClick={() => setInput(prev => prev + emoji)}
-                  className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 active:scale-95 transition-all flex items-center justify-center text-xl"
+                  onClick={() => { setIsAnonymous(!isAnonymous); setShowActions(false); }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition ${isAnonymous ? 'bg-purple-600 text-white shadow-lg' : 'hover:bg-white/10 text-gray-300'}`}
                 >
-                  {emoji}
+                  <Ghost size={16} /> {isAnonymous ? 'Ghost Mode ON' : 'Confession Mode'}
                 </button>
-              ))}
-            </div>
+                <button
+                  onClick={() => { setInput('/poll Question? | Option 1 | Option 2'); setShowActions(false); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-300 hover:bg-white/10 transition"
+                >
+                  <BarChart2 size={16} /> Create Poll
+                </button>
+                <button 
+                  onClick={() => { alert('Coming soon!'); setShowActions(false); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-300 hover:bg-white/10 transition"
+                >
+                  <Paperclip size={16} /> Attach File
+                </button>
+              </div>
+            )}
 
             {replyTo && (
               <div className="mb-2 bg-white/5 p-2 rounded-lg flex justify-between items-center border-l-2 border-[#D4A843]">
@@ -230,26 +244,36 @@ export default function ChatInterface() {
                 </button>
               </div>
             )}
+            
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-2 py-1 flex-1">
+              <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-1 py-1 flex-1 relative">
                 <button 
-                  onClick={() => alert('File uploads require a cloud storage bucket (like AWS S3) to be set up! Coming soon!')}
+                  onClick={() => setShowActions(!showActions)}
                   className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition"
-                  title="Attach File"
+                  title="More Actions"
                 >
-                  <Paperclip size={18} />
+                  <Plus size={18} />
                 </button>
+                
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Type a message..."
-                  className="flex-1 bg-transparent px-2 py-2 text-white focus:outline-none"
+                  className="flex-1 bg-transparent px-2 py-2 text-white focus:outline-none text-sm"
                 />
+                
                 <button 
-                  onClick={() => alert('Voice notes require a cloud storage bucket to be set up! Coming soon!')}
-                  className="p-2 text-gray-400 hover:text-[#D4A843] hover:bg-[#D4A843]/10 rounded-full transition"
+                  onClick={() => setShowEmojis(!showEmojis)}
+                  className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-white/10 rounded-full transition"
+                  title="Emojis"
+                >
+                  <Smile size={18} />
+                </button>
+                <button 
+                  onClick={() => alert('Voice notes coming soon!')}
+                  className="p-2 text-gray-400 hover:text-[#D4A843] hover:bg-white/10 rounded-full transition"
                   title="Record Voice Note"
                 >
                   <Mic size={18} />
@@ -257,9 +281,9 @@ export default function ChatInterface() {
               </div>
               <button 
                 onClick={handleSend}
-                className="bg-[#2D8A5E] hover:bg-[#3ab078] text-white p-3.5 rounded-full transition shadow-lg shrink-0"
+                className="bg-[#2D8A5E] hover:bg-[#3ab078] text-white p-3 rounded-full transition shadow-lg shrink-0"
               >
-                <Send size={20} />
+                <Send size={18} />
               </button>
             </div>
           </div>
