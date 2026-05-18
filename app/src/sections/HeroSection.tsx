@@ -1,5 +1,7 @@
 import NameHelix from '../components/NameHelix'
 import BottomNav from '../components/BottomNav'
+import { useChatStore } from '../store/chatStore'
+import { getSocket } from '../lib/socket'
 
 const stats = [
   { value: '12,438', label: 'Online' },
@@ -10,6 +12,18 @@ const stats = [
 const avatarColors = ['#D4A843', '#2D8A5E', '#FF8C69', '#6B2D5B', '#2D5A6B']
 
 export default function HeroSection() {
+  const { currentUser, setActiveRoom } = useChatStore()
+
+  const handleJoin = () => {
+    if (!currentUser) {
+      // If not logged in, clear local storage just to be safe and let user see login modal by removing currentUser
+      // Wait, LoginModal shows automatically if currentUser is null.
+      // But they are already seeing the hero section. That means currentUser is NOT null.
+      // If currentUser is not null, open the main room.
+    }
+    setActiveRoom('Friends Vibing')
+    getSocket()?.emit('join_room', 'Friends Vibing')
+  }
   return (
     <section
       className="relative flex flex-col items-center justify-center overflow-hidden"
@@ -70,6 +84,7 @@ export default function HeroSection() {
         {/* CTA Group */}
         <div className="flex flex-wrap items-center justify-center gap-4 mt-10 animate-float">
           <button
+            onClick={handleJoin}
             className="px-10 py-[18px] rounded-2xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:brightness-110"
             style={{
               background: 'linear-gradient(135deg, #D4A843, #FF8C69)',
@@ -80,6 +95,7 @@ export default function HeroSection() {
             🚀 Join the Vibe
           </button>
           <button
+            onClick={handleJoin}
             className="px-10 py-[18px] rounded-2xl font-semibold text-base transition-all duration-300 hover:bg-[rgba(255,255,255,0.12)]"
             style={{
               background: 'rgba(255,255,255,0.07)',
