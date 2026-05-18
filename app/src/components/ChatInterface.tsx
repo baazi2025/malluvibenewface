@@ -78,10 +78,13 @@ export default function ChatInterface() {
     getSocket()?.emit('send_message', { 
       room: activeRoom, 
       content: emoji, 
-      replyToId: null,
+      replyToId: replyTo?.id || null,
       isAnonymous: false,
       pollData: null
     });
+    
+    // Clear reply state if it was a reply
+    setReplyTo(null);
     
     // Anti-spam cooldown
     setCooldown(true);
