@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2 } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -12,7 +12,7 @@ export default function ChatInterface() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍'];
+  const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍', '💯', '✨', '💀', '👀', '🥺', '😎', '💃', '🕺', '🥳', '🙌', '🍿', '🎲'];
 
   // Group users by status
   const onlineUsers = users.filter(u => u.status === 'online');
@@ -231,17 +231,33 @@ export default function ChatInterface() {
               </div>
             )}
             <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Type a message..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-3 text-white focus:outline-none focus:border-white/30"
-              />
+              <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-2 py-1 flex-1">
+                <button 
+                  onClick={() => alert('File uploads require a cloud storage bucket (like AWS S3) to be set up! Coming soon!')}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition"
+                  title="Attach File"
+                >
+                  <Paperclip size={18} />
+                </button>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-transparent px-2 py-2 text-white focus:outline-none"
+                />
+                <button 
+                  onClick={() => alert('Voice notes require a cloud storage bucket to be set up! Coming soon!')}
+                  className="p-2 text-gray-400 hover:text-[#D4A843] hover:bg-[#D4A843]/10 rounded-full transition"
+                  title="Record Voice Note"
+                >
+                  <Mic size={18} />
+                </button>
+              </div>
               <button 
                 onClick={handleSend}
-                className="bg-[#2D8A5E] hover:bg-[#3ab078] text-white p-3 rounded-full transition shadow-lg"
+                className="bg-[#2D8A5E] hover:bg-[#3ab078] text-white p-3.5 rounded-full transition shadow-lg shrink-0"
               >
                 <Send size={20} />
               </button>

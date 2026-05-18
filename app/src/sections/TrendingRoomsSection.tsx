@@ -55,6 +55,7 @@ export default function TrendingRoomsSection() {
 
   return (
     <section
+      id="rooms-section"
       ref={sectionRef}
       className="overflow-hidden"
       style={{

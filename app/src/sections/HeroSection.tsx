@@ -12,15 +12,9 @@ const stats = [
 const avatarColors = ['#D4A843', '#2D8A5E', '#FF8C69', '#6B2D5B', '#2D5A6B']
 
 export default function HeroSection() {
-  const { currentUser, setActiveRoom, setShowLoginModal } = useChatStore()
-
   const handleJoin = () => {
-    if (!currentUser) {
-      setShowLoginModal(true);
-      return;
-    }
-    setActiveRoom('Friends Vibing')
-    getSocket()?.emit('join_room', 'Friends Vibing')
+    // Scroll to the rooms section
+    document.getElementById('rooms-section')?.scrollIntoView({ behavior: 'smooth' });
   }
   return (
     <section
