@@ -81,8 +81,8 @@ export default function ChatInterface() {
   if (!activeRoom) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#001F3F]/90 backdrop-blur-md flex items-center justify-center p-4 md:p-6">
-      <div className="bg-[#0A2A4A] w-full max-w-[95vw] h-[95vh] rounded-3xl border border-white/10 flex overflow-hidden shadow-2xl flex-col md:flex-row">
+    <div className="fixed inset-0 z-50 bg-[#001F3F]/95 backdrop-blur-md flex items-center justify-center p-2">
+      <div className="bg-[#0A2A4A] w-full max-w-[98vw] h-[98vh] rounded-2xl border border-white/10 flex overflow-hidden shadow-2xl flex-col md:flex-row">
         
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col h-full border-r border-white/10">
@@ -103,7 +103,7 @@ export default function ChatInterface() {
           <GamesMenu />
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
             {messages.map((msg) => {
               // Check if sender is blocked
               const isBlocked = relations.some(r => r.targetId === msg.senderId && r.type === 'BLOCK');
@@ -120,15 +120,15 @@ export default function ChatInterface() {
               return (
                 <div key={msg.id} id={`msg-${msg.id}`} className={`flex flex-col ${isMe && !msg.isAnonymous ? 'items-end' : 'items-start'} relative group/msg`}>
                   <div className="flex items-center gap-2 mb-1">
-                    {!isMe && <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs">{msg.sender.username[0].toUpperCase()}</div>}
-                    <span className={`text-sm font-bold ${isBirthday ? 'text-[#D4A843]' : 'text-gray-300'} flex items-center gap-1`}>
-                      {msg.isAnonymous && <Ghost size={12} className="text-gray-400" />}
+                    {!isMe && <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px]">{msg.sender.username[0].toUpperCase()}</div>}
+                    <span className={`text-xs font-bold ${isBirthday ? 'text-[#D4A843]' : 'text-gray-300'} flex items-center gap-1`}>
+                      {msg.isAnonymous && <Ghost size={10} className="text-gray-400" />}
                       {msg.isAnonymous ? 'Anonymous' : msg.sender.username} {isBirthday && '🎉'}
                     </span>
-                    <span className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</span>
+                    <span className="text-[10px] text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</span>
                   </div>
                   
-                  <div className={`max-w-[70%] group relative ${msg.isGame ? 'bg-gradient-to-tr from-purple-600 to-blue-600 border border-purple-400/50' : isMe ? 'bg-blue-600' : 'bg-white/10'} rounded-2xl px-4 py-3 shadow-lg`}>
+                  <div className={`max-w-[75%] group relative ${msg.isGame ? 'bg-gradient-to-tr from-purple-600 to-blue-600 border border-purple-400/50' : isMe ? 'bg-blue-600' : 'bg-white/10'} rounded-2xl px-3 py-2 shadow-md`}>
                     {msg.replyTo && (
                       <div 
                         onClick={() => scrollToMessage(msg.replyTo!.id)}
@@ -138,7 +138,7 @@ export default function ChatInterface() {
                         {msg.replyTo.content.substring(0, 50)}...
                       </div>
                     )}
-                    <p className="text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    <p className="text-white whitespace-pre-wrap leading-normal text-sm">{msg.content}</p>
                     
                     {/* Poll Rendering */}
                     {msg.pollData && (
@@ -267,8 +267,17 @@ export default function ChatInterface() {
 
         {/* Chatters List Tab */}
         <div className="w-full md:w-96 bg-black/20 flex flex-col h-full border-l border-white/10">
-          <div className="p-4 border-b border-white/10 bg-white/5">
+          <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
             <h3 className="text-white font-semibold">Chatters</h3>
+            <button 
+              onClick={() => {
+                localStorage.removeItem('mallu_chat_user');
+                window.location.reload();
+              }}
+              className="text-xs text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded"
+            >
+              Logout
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
             
