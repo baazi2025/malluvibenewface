@@ -9,7 +9,6 @@ export default function ChatInterface() {
   const { activeRoom, setActiveRoom, messages, users, currentUser, relations } = useChatStore();
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<any>(null);
-  const [cooldown, setCooldown] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +26,13 @@ export default function ChatInterface() {
   const handleSend = () => {
     if (!input.trim() && !replyTo) return;
     
+    const trimmedInput = input.trim();
+    
+    // Check if it's purely a reaction emoji
+    if (EMOJIS.includes(trimmedInput)) {
+      getSocket()?.emit('send_reaction', { room: activeRoom, emoji: trimmedInput });
+    }
+
     // Check if it's a poll command
     let pollData = null;
     let actualContent = input;
@@ -66,29 +72,6 @@ export default function ChatInterface() {
       el.classList.add('bg-white/20');
       setTimeout(() => el.classList.remove('bg-white/20'), 1500);
     }
-  };
-
-  const sendReaction = (emoji: string) => {
-    if (cooldown || !currentUser) return;
-    
-    // 1. Trigger the screen-wide animation burst
-    getSocket()?.emit('send_reaction', { room: activeRoom, emoji });
-    
-    // 2. Deliver it to the chat room feed
-    getSocket()?.emit('send_message', { 
-      room: activeRoom, 
-      content: emoji, 
-      replyToId: replyTo?.id || null,
-      isAnonymous: false,
-      pollData: null
-    });
-    
-    // Clear reply state if it was a reply
-    setReplyTo(null);
-    
-    // Anti-spam cooldown
-    setCooldown(true);
-    setTimeout(() => setCooldown(false), 500);
   };
 
   const handleGameAction = (points: number) => {
@@ -228,9 +211,8 @@ export default function ChatInterface() {
               {EMOJIS.map(emoji => (
                 <button
                   key={emoji}
-                  onClick={() => sendReaction(emoji)}
-                  disabled={cooldown}
-                  className={`flex-shrink-0 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 active:scale-95 transition-all flex items-center justify-center text-xl ${cooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => setInput(prev => prev + emoji)}
+                  className="flex-shrink-0 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 active:scale-95 transition-all flex items-center justify-center text-xl"
                 >
                   {emoji}
                 </button>
