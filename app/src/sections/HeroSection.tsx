@@ -1,5 +1,5 @@
 import NameHelix from '../components/NameHelix'
-import BottomNav from '../components/BottomNav'
+import { useChatStore } from '../store/chatStore'
 
 const stats = [
   { value: '12,438', label: 'Online' },
@@ -10,9 +10,13 @@ const stats = [
 const avatarColors = ['#D4A843', '#2D8A5E', '#FF8C69', '#6B2D5B', '#2D5A6B']
 
 export default function HeroSection() {
+  const { setHasEnteredSite } = useChatStore()
+
   const handleJoin = () => {
-    // Scroll to the rooms section
-    document.getElementById('rooms-section')?.scrollIntoView({ behavior: 'smooth' });
+    setHasEnteredSite(true)
+    setTimeout(() => {
+      document.getElementById('rooms-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   }
   return (
     <section
@@ -135,9 +139,6 @@ export default function HeroSection() {
           </span>
         </div>
       </div>
-
-      {/* Bottom Nav */}
-      <BottomNav />
     </section>
   )
 }

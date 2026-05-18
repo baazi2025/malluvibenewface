@@ -16,11 +16,13 @@ import RadioPlayer from './components/RadioPlayer'
 import LoginModal from './components/LoginModal'
 import ReactionSystem from './components/ReactionSystem'
 import AnimatedBackground from './components/AnimatedBackground'
+import { useChatStore } from './store/chatStore'
 
 gsap.registerPlugin(ScrollTrigger)
 
 function App() {
   const lenisRef = useRef<Lenis | null>(null)
+  const { hasEnteredSite } = useChatStore()
 
   useEffect(() => {
     // Initialize Lenis smooth scroll
@@ -58,19 +60,24 @@ function App() {
     >
       <AnimatedBackground />
       <div className="relative z-10">
-      <HeroSection />
-      <TrendingRoomsSection />
-      <FeaturesSection />
-      <LiveNowSection />
-      <LoginBonusSection />
-      <FooterSection />
+        <HeroSection />
+        
+        {hasEnteredSite && (
+          <>
+            <TrendingRoomsSection />
+            <FeaturesSection />
+            <LiveNowSection />
+            <LoginBonusSection />
+            <FooterSection />
 
-      {/* Chat Platform Modals and Overlays */}
-      <LoginModal />
-      <ChatInterface />
-      <DirectMessageModal />
-      <RadioPlayer />
-      <ReactionSystem />
+            {/* Chat Platform Modals and Overlays */}
+            <LoginModal />
+            <ChatInterface />
+            <DirectMessageModal />
+            <RadioPlayer />
+            <ReactionSystem />
+          </>
+        )}
       </div>
     </div>
   )
