@@ -28,6 +28,10 @@ export const initSocket = (userId: number) => {
     useChatStore.getState().updateUser(userId, { birthdate });
   });
 
+  socket.on('user_update', ({ userId, points }) => {
+    useChatStore.getState().updateUser(userId, { points });
+  });
+
   socket.on('room_history', ({ room, messages }) => {
     if (useChatStore.getState().activeRoom === room) {
       useChatStore.getState().setMessages(messages);

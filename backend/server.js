@@ -4,6 +4,13 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 
+// Simple Game Prompts Data
+const GAMES_DATA = {
+  'truth_or_dare': ['Truth: What is your biggest secret?', 'Dare: Send a voice note singing a Malayalam song', 'Truth: Who was your first crush?', 'Dare: Change your status to something embarrassing for 10 mins'],
+  'would_you_rather': ['Would you rather eat only Biryani for a month or never eat Biryani again?', 'Would you rather have a flying car or a teleportation device?'],
+  'movie_guess': ['Guess the movie: 👦🏻⛵🐅🌊 (Life of Pi)', 'Guess the movie: 👨🏻‍🦱🕶️🦯🎸 (Andhadhun)', 'Guess the movie: 🧔🏻‍♂️🔫🐕💀 (John Wick)'],
+};
+
 const prisma = new PrismaClient();
 const app = express();
 app.use(cors());
@@ -75,7 +82,7 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', async (data) => {
     if (!currentUser) return;
-    const { room, content, replyToId } = data;
+    const { room, content, replyToId, isGame } = data;
     try {
       const msg = await prisma.message.create({
         data: {
@@ -86,10 +93,48 @@ io.on('connection', (socket) => {
         },
         include: { sender: true, replyTo: { include: { sender: true } } }
       });
-      io.to(room).emit('new_message', msg);
+      // Attach game flag dynamically (not saved in DB for simplicity, just passed to clients)
+      io.to(room).emit('new_message', { ...msg, isGame: !!isGame });
     } catch (e) {
       console.error(e);
     }
+  });
+
+  socket.on('start_game', async (data) => {
+    if (!currentUser) return;
+    const { room, gameType } = data;
+    
+    let content = `🎮 Started a game of ${gameType.replace(/_/g, ' ').toUpperCase()}!`;
+    if (GAMES_DATA[gameType]) {
+      const prompts = GAMES_DATA[gameType];
+      content += `\n\nPrompt: ${prompts[Math.floor(Math.random() * prompts.length)]}`;
+    }
+
+    try {
+      const msg = await prisma.message.create({
+        data: {
+          content,
+          roomId: room,
+          senderId: currentUser.id,
+        },
+        include: { sender: true }
+      });
+      io.to(room).emit('new_message', { ...msg, isGame: true, gameType });
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  socket.on('award_points', async (data) => {
+    if (!currentUser) return;
+    const { points } = data;
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: currentUser.id },
+        data: { points: { increment: points } }
+      });
+      io.emit('user_update', { userId: currentUser.id, points: updatedUser.points });
+    } catch(e) {}
   });
 
   socket.on('send_reaction', (data) => {

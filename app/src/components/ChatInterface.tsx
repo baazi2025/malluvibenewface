@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Gamepad2 } from 'lucide-react';
 import { format } from 'date-fns';
+import GamesMenu from './GamesMenu';
 
 export default function ChatInterface() {
   const { activeRoom, setActiveRoom, messages, users, currentUser, relations } = useChatStore();
@@ -55,6 +56,10 @@ export default function ChatInterface() {
     setTimeout(() => setCooldown(false), 500);
   };
 
+  const handleGameAction = (points: number) => {
+    getSocket()?.emit('award_points', { points });
+  };
+
   if (!activeRoom) return null;
 
   return (
@@ -75,6 +80,9 @@ export default function ChatInterface() {
               <X size={20} className="text-white" />
             </button>
           </div>
+
+          {/* Games Menu Widget */}
+          <GamesMenu />
 
           {/* Messages Feed */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -101,7 +109,7 @@ export default function ChatInterface() {
                     <span className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</span>
                   </div>
                   
-                  <div className={`max-w-[70%] group relative ${isMe ? 'bg-blue-600' : 'bg-white/10'} rounded-2xl px-4 py-2`}>
+                  <div className={`max-w-[70%] group relative ${msg.isGame ? 'bg-gradient-to-tr from-purple-600 to-blue-600 border border-purple-400/50' : isMe ? 'bg-blue-600' : 'bg-white/10'} rounded-2xl px-4 py-3 shadow-lg`}>
                     {msg.replyTo && (
                       <div 
                         onClick={() => scrollToMessage(msg.replyTo!.id)}
@@ -111,7 +119,18 @@ export default function ChatInterface() {
                         {msg.replyTo.content.substring(0, 50)}...
                       </div>
                     )}
-                    <p className="text-white">{msg.content}</p>
+                    <p className="text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    
+                    {msg.isGame && !isMe && (
+                      <div className="mt-3 flex gap-2">
+                        <button onClick={() => handleGameAction(10)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition flex items-center gap-1">
+                          <Trophy size={12} className="text-yellow-400" /> +10 Points
+                        </button>
+                        <button onClick={() => handleGameAction(5)} className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full transition">
+                          👍 Nice Play
+                        </button>
+                      </div>
+                    )}
                     
                     {/* Reply Button (Hover) */}
                     <button 
@@ -243,6 +262,11 @@ function UserItem({ user, currentUser }: { user: any, currentUser: any }) {
             {user.username}
           </p>
           {isBirthday && <span title="Birthday Boy/Girl">🎉</span>}
+          {user.points > 0 && (
+            <span className="ml-1 bg-[#D4A843]/20 text-[#D4A843] text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
+              <Trophy size={10} /> {user.points}
+            </span>
+          )}
         </div>
         {user.note && (
           <p className="text-xs text-gray-400 truncate flex items-center gap-1">

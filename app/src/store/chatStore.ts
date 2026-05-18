@@ -7,6 +7,9 @@ export interface User {
   note: string;
   birthdate: string | null;
   status: 'online' | 'idle' | 'offline';
+  points: number;
+  streak: number;
+  badges: string;
 }
 
 export interface Message {
@@ -18,6 +21,8 @@ export interface Message {
   replyToId: number | null;
   replyTo: Message | null;
   createdAt: string;
+  isGame?: boolean;
+  gameType?: string;
 }
 
 export interface DirectMessage {
