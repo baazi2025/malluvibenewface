@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getSocket } from '../lib/socket';
-import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic, Plus, Image, Sticker } from 'lucide-react';
+import { Send, X, Reply, Smile, Music, Trophy, Ghost, BarChart2, Paperclip, Mic, Plus, Image, Sticker, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import GamesMenu from './GamesMenu';
 
@@ -12,6 +12,7 @@ export default function ChatInterface() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [showChatters, setShowChatters] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const EMOJIS = ['🔥', '😂', '❤️', '🎉', '💥', '👑', '🚀', '😍', '💯', '✨', '💀', '👀', '🥺', '😎', '💃', '🕺', '🥳', '🙌', '🍿', '🎲'];
@@ -94,11 +95,21 @@ export default function ChatInterface() {
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 {activeRoom === 'Friends Vibing' ? '🎉' : '💖'} {activeRoom}
               </h2>
-              <p className="text-sm text-gray-400">{users.length} members</p>
+              <p className="text-sm text-gray-400 md:hidden cursor-pointer" onClick={() => setShowChatters(true)}>
+                {users.length} members <span className="text-xs text-blue-400 ml-1">(tap to view)</span>
+              </p>
+              <p className="text-sm text-gray-400 hidden md:block">
+                {users.length} members
+              </p>
             </div>
-            <button onClick={() => setActiveRoom(null)} className="p-2 hover:bg-white/10 rounded-full transition">
-              <X size={20} className="text-white" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowChatters(true)} className="p-2 hover:bg-white/10 rounded-full transition md:hidden text-white">
+                <Users size={20} />
+              </button>
+              <button onClick={() => setActiveRoom(null)} className="p-2 hover:bg-white/10 rounded-full transition text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400">
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Games Menu Widget */}
@@ -329,18 +340,23 @@ export default function ChatInterface() {
         </div>
 
         {/* Chatters List Tab */}
-        <div className="w-full md:w-96 bg-black/20 flex flex-col h-full border-l border-white/10">
+        <div className={`${showChatters ? 'flex absolute inset-0 z-50' : 'hidden'} md:relative md:flex w-full md:w-96 bg-[#0A2A4A] md:bg-black/20 flex-col h-full border-l border-white/10`}>
           <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
             <h3 className="text-white font-semibold">Chatters</h3>
-            <button 
-              onClick={() => {
-                localStorage.removeItem('mallu_chat_user');
-                window.location.reload();
-              }}
-              className="text-xs text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded"
-            >
-              Logout
-            </button>
+            <div className="flex gap-3 items-center">
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('mallu_chat_user');
+                  window.location.reload();
+                }}
+                className="text-xs text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded"
+              >
+                Logout
+              </button>
+              <button onClick={() => setShowChatters(false)} className="md:hidden text-white p-1 hover:bg-white/10 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
             
